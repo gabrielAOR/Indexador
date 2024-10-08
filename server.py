@@ -1,10 +1,10 @@
 import socket
 import re
 import os
-from utils import handle_post, read_file, find_string, find_first_html_file
+from utils import handle_post, read_file, find_first_html_file
 
 
-SERVER_HOST = "0.0.0.0"
+SERVER_HOST = "0.0.0.0" # need to change to server ip
 SERVER_PORT = 8080
 client_folders = {}
 
@@ -27,7 +27,6 @@ def parse_request(request):
     return http_method, path
 
 def get_content_type(path):
-  """Return the appropriate content type based on file extension."""
   if path.endswith('.html'):
     return 'text/html'
   elif path.endswith('.css'):
@@ -47,7 +46,6 @@ def get_method(path, client_addr):
   if files_pattern.search(path): filepath = base_folder + path
   else:
     if os.path.exists(os.getcwd() + path):
-      print(find_first_html_file(path.lstrip('/')))
       client_folders[ip] = path
       filepath = path +  "/" + find_first_html_file(path.lstrip('/'))
     else:
@@ -74,7 +72,6 @@ def start_server():
     http_method, path = parse_request(request)
 
     if not http_method or not path:
-      # Handle malformed request
       response = 'HTTP/1.1 400 Bad Request\r\nContent-Type: text/html\r\n\r\n<h1>400 Bad Request</h1>'
     else:
       print(request)
