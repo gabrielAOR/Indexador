@@ -1,4 +1,5 @@
 import os
+import glob
 
 def find_string(start_str, string, end_str="-----"):
   try:
@@ -13,7 +14,6 @@ def find_string(start_str, string, end_str="-----"):
     return "Valor passado incorreto"
   
 def read_file(path):
-  """Read and return the content of a file."""
   if os.path.exists(path) and os.path.isfile(path):
     with open(path, 'r') as file:
       content = file.read()
@@ -32,9 +32,18 @@ def store_file(folder, content, filename):
 
 def handle_post(request):
   folder_name = find_string("siteName\"", request)
-  text_to_find = {'text/html':"index.html", 'text/css':"style.css", 'application/x-javascript':"script.js"}
+  text_to_find = find_string('\"\r\nContent-Type:',request,end_str='\n')
 
-  for key, value in text_to_find.items():
-    file_content = find_string(key, request)
-    store_file(folder_name, file_content, value)
+  filename = find_string("filename=\"", request, end_str='\"')
+
+  file_content = find_string(text_to_find, request)
+  store_file(folder_name, file_content, filename)  
+
+
+def find_first_html_file(folder_path):
+  html_files = glob.glob(os.path.join(folder_path, '*.html'))
   
+  if html_files:
+    return os.path.basename(html_files[0])
+  else:
+    return None
